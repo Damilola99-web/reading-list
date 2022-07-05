@@ -1,11 +1,30 @@
 import { auth } from '../firebase/config';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, signInWithRedirect } from 'firebase/auth';
 import { useState } from 'react';
 import { useAuthContext } from './useAuthContext';
+import { GoogleAuthProvider } from 'firebase/auth';
+
 export const useLogin = () => {
 	const { dispatch } = useAuthContext();
 	const [ error, setError ] = useState(null);
 	const [ isPending, setIspending ] = useState(false);
+
+	const googleSignUp = () => {
+		console.log('hey');
+		const provider = new GoogleAuthProvider();
+		setIspending(true);
+		setError(null);
+		signInWithRedirect(auth, provider)
+			.then((res) => {
+				dispatch({ type: 'LOGIN', payload: res.user });
+				setIspending(false);
+				setError(null);
+			})
+			.catch((err) => {
+				setError(err.message);
+				setIspending(false);
+			});
+	};
 
 	const login = (email, password) => {
 		setIspending(true);
@@ -22,5 +41,5 @@ export const useLogin = () => {
 			});
 	};
 
-	return { login, error, isPending };
+	return { login, error, isPending, googleSignUp };
 };
