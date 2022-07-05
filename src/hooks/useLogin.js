@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword, signInWithPopup, signInWithRedirect } from 
 import { useState } from 'react';
 import { useAuthContext } from './useAuthContext';
 import { GoogleAuthProvider } from 'firebase/auth';
+import { GithubAuthProvider } from 'firebase/auth';
 
 export const useLogin = () => {
 	const { dispatch } = useAuthContext();
@@ -15,6 +16,21 @@ export const useLogin = () => {
 		setIspending(true);
 		setError(null);
 		signInWithRedirect(auth, provider)
+			.then((res) => {
+				dispatch({ type: 'LOGIN', payload: res.user });
+				setIspending(false);
+				setError(null);
+			})
+			.catch((err) => {
+				setError(err.message);
+				setIspending(false);
+			});
+	};
+	const githubSignUp = () => {
+		const provider = new GithubAuthProvider();
+		setIspending(true);
+		setError(null);
+		signInWithPopup(auth, provider)
 			.then((res) => {
 				dispatch({ type: 'LOGIN', payload: res.user });
 				setIspending(false);
@@ -41,5 +57,5 @@ export const useLogin = () => {
 			});
 	};
 
-	return { login, error, isPending, googleSignUp };
+	return { login, error, isPending, googleSignUp, githubSignUp };
 };
